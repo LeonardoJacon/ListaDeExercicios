@@ -1,0 +1,56 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct {
+    char nome[50];
+    float nota;
+} Aluno;
+
+Aluno* maiorNota(Aluno *p, int n) {
+    int i;
+    Aluno *maior = p;
+
+    for (i = 1; i < n; i++) {
+        if ((p + i)->nota > maior->nota) {
+            maior = (p + i);
+        }
+    }
+
+    return maior;
+}
+
+int main() {
+    int n, i;
+    Aluno *alunos;
+    Aluno *topo;
+
+    printf("Digite a quantidade de alunos: ");
+    scanf("%d", &n);
+
+    alunos = (Aluno*) malloc(n * sizeof(Aluno));
+
+    if (alunos == NULL) {
+        printf("Erro de alocacao!\n");
+        return 1;
+    }
+
+    for (i = 0; i < n; i++) {
+        printf("\nAluno %d\n", i + 1);
+
+        printf("Nome: ");
+        scanf("%s", (alunos + i)->nome);
+
+        printf("Nota: ");
+        scanf("%f", &((alunos + i)->nota));
+    }
+
+    topo = maiorNota(alunos, n);
+
+    printf("\nAluno com maior nota:\n");
+    printf("Nome: %s\n", topo->nome);
+    printf("Nota: %.2f\n", topo->nota);
+    
+    free(alunos);
+
+    return 0;
+}
