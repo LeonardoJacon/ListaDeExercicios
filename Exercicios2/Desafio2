@@ -1,84 +1,64 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct Documento {
-    int id;
-    int paginas;
-    int prioridade;
-    struct Documento *prox;
-} Documento;
+typedef struct No {
+    char valor;
+    struct No *prox;
+} No;
 
 typedef struct {
-    Documento *inicio;
-} FilaPrioridade;
+    No *topo;
+} Pilha;
 
-void inicializar(FilaPrioridade *f) {
-    f->inicio = NULL;
+void inicializar(Pilha *p) {
+    p->topo = NULL;
 }
 
-void enqueue(FilaPrioridade *f, int id, int paginas, int prioridade) {
-    Documento *novo = (Documento*) malloc(sizeof(Documento));
-    novo->id = id;
-    novo->paginas = paginas;
-    novo->prioridade = prioridade;
-    novo->prox = NULL;
-
-    if (f->inicio == NULL || prioridade < f->inicio->prioridade) {
-        novo->prox = f->inicio;
-        f->inicio = novo;
-    } else {
-        Documento *atual = f->inicio;
-
-        while (atual->prox != NULL &&
-               atual->prox->prioridade <= prioridade) {
-            atual = atual->prox;
-        }
-
-        novo->prox = atual->prox;
-        atual->prox = novo;
-    }
+int isEmpty(Pilha *p) {
+    return p->topo == NULL;
 }
 
-Documento* dequeue(FilaPrioridade *f) {
-    if (f->inicio == NULL) return NULL;
+void push(Pilha *p, char c) {
+    No *novo = (No*) malloc(sizeof(No));
+    novo->valor = c;
+    novo->prox = p->topo;
+    p->topo = novo;
+}
 
-    Documento *temp = f->inicio;
-    f->inicio = f->inicio->prox;
-    return temp;
+char pop(Pilha *p) {
+    if (isEmpty(p)) return '\0';
+
+    No *temp = p->topo;
+    char valor = temp->valor;
+
+    p->topo = temp->prox;
+    free(temp);
+
+    return valor;
 }
 
 int main() {
-    FilaPrioridade fila;
-    inicializar(&fila);
+    Pilha p;
+    inicializar(&p);
 
-    int n, i, id, paginas, prioridade;
+    char str[100];
+    int i = 0;
 
-    printf("Quantidade de documentos: ");
-    scanf("%d", &n);
+    printf("Digite uma string: ");
+    scanf("%s", str);
 
-    for (i = 0; i < n; i++) {
-        printf("\nDocumento %d\n", i + 1);
-
-        printf("ID: ");
-        scanf("%d", &id);
-
-        printf("Numero de paginas: ");
-        scanf("%d", &paginas);
-
-        printf("Prioridade (menor = mais urgente): ");
-        scanf("%d", &prioridade);
-
-        enqueue(&fila, id, paginas, prioridade);
+    while (str[i] != '\0') {
+        push(&p, str[i]);
+        i++;
     }
 
-    printf("\n--- Impressao ---\n");
+    printf("String invertida: ");
 
-    Documento *d;
-    while ((d = dequeue(&fila)) != NULL) {
-        printf("Documento %d | Paginas: %d | Prioridade: %d\n",
-               d->id, d->paginas, d->prioridade);
-        free(d);
+    while (!isEmpty(&p)) {
+        printf("%c", pop(&p));
     }
+
+    printf("\n");
 
     return 0;
 }
