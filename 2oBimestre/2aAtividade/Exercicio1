@@ -1,0 +1,200 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct No {
+    int valor;
+    struct No *prox;
+} No;
+
+No* criarNo(int valor) {
+
+    No *novo = (No*) malloc(sizeof(No));
+
+    if (novo == NULL) {
+        printf("Erro de memoria!\n");
+        exit(1);
+    }
+
+    novo->valor = valor;
+    novo->prox = NULL;
+
+    return novo;
+}
+
+void inserirFinal(No **head, int valor) {
+
+    No *novo = criarNo(valor);
+
+    if (*head == NULL) {
+        *head = novo;
+        return;
+    }
+
+    No *temp = *head;
+
+    while (temp->prox != NULL) {
+        temp = temp->prox;
+    }
+
+    temp->prox = novo;
+}
+
+void exibirLista(No *head) {
+
+    while (head != NULL) {
+        printf("%d -> ", head->valor);
+        head = head->prox;
+    }
+
+    printf("NULL\n");
+}
+
+
+
+void inserirPosicao(No **head, int valor, int posicao) {
+
+    if (posicao < 0) {
+        printf("Posicao invalida!\n");
+        return;
+    }
+
+    No *novo = criarNo(valor);
+
+    if (posicao == 0) {
+        novo->prox = *head;
+        *head = novo;
+        return;
+    }
+
+    No *temp = *head;
+    int i = 0;
+
+    while (temp != NULL && i < posicao - 1) {
+        temp = temp->prox;
+        i++;
+    }
+
+    if (temp == NULL) {
+        printf("Posicao invalida!\n");
+        free(novo);
+        return;
+    }
+
+    novo->prox = temp->prox;
+    temp->prox = novo;
+}
+
+
+
+int buscarValor(No *head, int valor) {
+
+    int posicao = 0;
+
+    while (head != NULL) {
+
+        if (head->valor == valor) {
+            return posicao;
+        }
+
+        head = head->prox;
+        posicao++;
+    }
+
+    return -1;
+}
+
+
+void inverterLista(No **head) {
+
+    No *anterior = NULL;
+    No *atual = *head;
+    No *proximo = NULL;
+
+    while (atual != NULL) {
+
+        proximo = atual->prox;
+
+        atual->prox = anterior;
+
+        anterior = atual;
+        atual = proximo;
+    }
+
+    *head = anterior;
+}
+
+
+void dividirLista(No *head, No **lista1, No **lista2) {
+
+    if (head == NULL) {
+        *lista1 = NULL;
+        *lista2 = NULL;
+        return;
+    }
+
+    No *lento = head;
+    No *rapido = head->prox;
+
+    while (rapido != NULL && rapido->prox != NULL) {
+        lento = lento->prox;
+        rapido = rapido->prox->prox;
+    }
+
+    *lista1 = head;
+    *lista2 = lento->prox;
+
+    lento->prox = NULL;
+}
+
+void liberarLista(No *head) {
+
+    No *temp;
+
+    while (head != NULL) {
+        temp = head;
+        head = head->prox;
+        free(temp);
+    }
+}
+
+int main() {
+
+    No *lista = NULL;
+
+    inserirFinal(&lista, 10);
+    inserirFinal(&lista, 20);
+    inserirFinal(&lista, 30);
+
+    printf("Lista original:\n");
+    exibirLista(lista);
+
+    inserirPosicao(&lista, 99, 1);
+
+    printf("\nDepois da insercao:\n");
+    exibirLista(lista);
+
+    int pos = buscarValor(lista, 20);
+
+    printf("\nValor 20 encontrado na posicao: %d\n", pos);
+
+    inverterLista(&lista);
+
+    printf("\nLista invertida:\n");
+    exibirLista(lista);
+
+    No *lista1 = NULL;
+    No *lista2 = NULL;
+
+    dividirLista(lista, &lista1, &lista2);
+
+    printf("\nLista 1:\n");
+    exibirLista(lista1);
+
+    printf("Lista 2:\n");
+    exibirLista(lista2);
+
+    liberarLista(lista1);
+    liberarLista(lista2);
+
+    return 0;
+}
